@@ -52,7 +52,7 @@ We use **conda** for environment management, with both an `environment.yml` and 
 
 ### 3.1. Using `environment.yml` (recommended for development)
 
-To create a development environmen from the repository root:
+To create a development environment from the repository root:
 
 `conda env create -f environment.yml -n dsci522_milestone1` <br>
 `conda activate dsci522_milestone1`
@@ -223,6 +223,7 @@ Logging off,
 
 TEAM 29MDS
 💜
+
 
 
 
