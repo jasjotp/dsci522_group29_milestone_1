@@ -52,15 +52,15 @@ Model performance is evaluated using **confusion matrices** on both training and
 
 ### 1.1. Clone the repository
 
-`git clone git@github.com:jasjotp/dsci522_group29_milestone_1.git` <br>
-`cd dsci522_group29_milestone_1`
+`git clone git@github.com:jasjotp/relationship-quality-prediction.git` <br>
+`cd relationship-quality-prediction`
 
 ---
 
 ##  2. Create the conda environment
 
-`conda env create -f environment.yml -n dsci522_milestone1` <br>
-`conda activate dsci522_milestone1`
+`conda env create -f environment.yml -n relationship-quality-prediction` <br>
+`conda activate relationship-quality-prediction`
 
 ---
 
@@ -68,8 +68,8 @@ Model performance is evaluated using **confusion matrices** on both training and
 
 For reproducible installs:
 
-`conda-lock install -n dsci522_milestone1 conda-lock.yml` <br>
-`conda activate dsci522_milestone1`
+`conda-lock install -n relationship-quality-prediction conda-lock.yml` <br>
+`conda activate relationship-quality-prediction`
 
 ---
 
