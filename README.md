@@ -52,7 +52,7 @@ Model performance is evaluated using **confusion matrices** on both training and
 
 ### 1.1. Clone the repository
 
-`git clone https://github.com/<your_repo>/dsci522_group29_milestone_1.git` <br>
+`git clone https://github.com/jasjotp/dsci522_group29_milestone_1.git` <br>
 `cd dsci522_group29_milestone_1`
 
 ---
