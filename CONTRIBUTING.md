@@ -199,7 +199,7 @@ Within the team, you’re encouraged to:
 
 9. License & Attribution
     
-The project is currently marked as using a Creative Commons license in the README. 
+The project is currently marked as using a MIT License in the README. 
 
 By contributing, you agree that your contributions may be distributed under the same license as the project.
 
@@ -223,3 +223,4 @@ Logging off,
 
 TEAM 29MDS
 💜
+
