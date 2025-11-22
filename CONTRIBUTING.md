@@ -197,7 +197,7 @@ Within the team, you’re encouraged to:
 
 ---
 
-9. License & Attribution
+## 9. License & Attribution
     
 The project is currently marked as using a MIT License in the README. 
 
@@ -210,7 +210,7 @@ If you add third-party code or resources:
 
 ---
 
-10. Questions?
+## 10. Questions?
 If anything in this document is unclear or out of date:
 Open an issue or PR to improve `CONTRIBUTING.md`, or
 Discuss with your teammates and update the docs so future contributors benefit, if applicable.
@@ -223,6 +223,7 @@ Logging off,
 
 TEAM 29MDS
 💜
+
 
 
 
