@@ -65,7 +65,7 @@ matplotlib 3.10.8<br>
 seaborn 0.13.2<br>
 altair 6.0.0<br>
 scikit-learn 1.7.2<br>
-pip 25.3 <br>
+conda 25.7.0 <br>
 environment<br>
 
 ### 3.2. Using `conda-lock.yml` (for fully reproducible installs)
@@ -223,5 +223,6 @@ Logging off,
 
 TEAM 29MDS
 💜
+
 
 
