@@ -9,5 +9,5 @@ dependencies:
   - seaborn=0.13.2
   - scikit-learn=1.7.2
   - pip=25.3
-  - deepcheck=0.18.1
+  - pointblank=0.16.0
   - pandera=0.25.0
