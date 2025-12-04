@@ -36,9 +36,9 @@ def main(data_file, figure_path):
     # Ensure the output directory exists
     output_prefix.parent.mkdir(parents=True, exist_ok=True)
 
-    # ---------------------------------------------------------------------
+
     # 1. Load preprocessed data from 03-preprocessing.py
-    # ---------------------------------------------------------------------
+ 
     # Expecting a joblib file with:
     #   data["X_train"], data["X_test"], data["y_train"], data["y_test"]
     data = joblib.load(input_path)
@@ -48,15 +48,15 @@ def main(data_file, figure_path):
     y_train = data["y_train"]
     y_test = data["y_test"]
 
-    # ---------------------------------------------------------------------
+
     # 2. Fit logistic regression model
-    # ---------------------------------------------------------------------
+
     logreg = LogisticRegression(max_iter=1000)
     logreg.fit(X_train, y_train)
 
-    # ---------------------------------------------------------------------
+
     # 3. Training confusion matrix
-    # ---------------------------------------------------------------------
+
     fig_train, ax_train = plt.subplots()
     disp_train = ConfusionMatrixDisplay.from_estimator(
         logreg, X_train, y_train, ax=ax_train
@@ -72,9 +72,9 @@ def main(data_file, figure_path):
     fig_train.savefig(train_cm_path, bbox_inches="tight")
     plt.close(fig_train)
 
-    # ---------------------------------------------------------------------
+
     # 4. Testing confusion matrix
-    # ---------------------------------------------------------------------
+
     fig_test, ax_test = plt.subplots()
     disp_test = ConfusionMatrixDisplay.from_estimator(
         logreg, X_test, y_test, ax=ax_test
@@ -90,9 +90,8 @@ def main(data_file, figure_path):
     fig_test.savefig(test_cm_path, bbox_inches="tight")
     plt.close(fig_test)
 
-    # ---------------------------------------------------------------------
     # 5. Micro-average AUC ROC (score)
-    # ---------------------------------------------------------------------
+
     y_score = logreg.predict_proba(X_test)
     micro_roc_auc_ovr = roc_auc_score(
         y_test,
@@ -107,9 +106,8 @@ def main(data_file, figure_path):
         f"{micro_roc_auc_ovr:.2f}"
     )
 
-    # ---------------------------------------------------------------------
     # 6. Micro-averaged AUC ROC plot
-    # ---------------------------------------------------------------------
+
     label_binarizer = LabelBinarizer().fit(y_train)
     y_onehot_test = label_binarizer.transform(y_test)
 
@@ -118,7 +116,7 @@ def main(data_file, figure_path):
         y_onehot_test.ravel(),
         y_score.ravel(),
         name="micro-average OvR",
-        color="darkorange",  # you can remove this if you want default colors
+        color="darkorange", 
         plot_chance_level=True,
         ax=ax_roc,
     )
@@ -137,9 +135,8 @@ def main(data_file, figure_path):
     fig_roc.savefig(roc_path, bbox_inches="tight")
     plt.close(fig_roc)
 
-    # ---------------------------------------------------------------------
     # 7. Save metrics table
-    # ---------------------------------------------------------------------
+
     metrics_df = pd.DataFrame(
         {
             "metric": ["micro_roc_auc_ovr"],
