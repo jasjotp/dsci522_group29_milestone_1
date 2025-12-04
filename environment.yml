@@ -12,3 +12,4 @@ dependencies:
   - pointblank=0.16.0
   - pandera=0.25.0
   - click=8.3.1
+  - ipykernal=7.1.0
