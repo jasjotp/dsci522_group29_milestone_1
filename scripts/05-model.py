@@ -3,12 +3,6 @@ from sklearn.preprocessing import LabelBinarizer
 import seaborn as sns
 import matplotlib.pyplot as plt
 
-# Correlation heatmap
-corr_mat = hcmst[['subject_age', 'relationship_duration', 'children']].corr()
-sns.heatmap(corr_mat, annot=True, cmap='coolwarm')
-plt.title('Correlation Matrix of Relevant Predictor Variables')
-plt.show()
-
 # Training confusion matrix
 disp_train = ConfusionMatrixDisplay.from_estimator(logreg, X_train, y_train)
 disp_train.ax_.grid(False)
