@@ -5,6 +5,7 @@ from sklearn.model_selection import train_test_split
 from sklearn.compose import make_column_transformer
 from sklearn.preprocessing import OneHotEncoder, OrdinalEncoder, StandardScaler
 from joblib import dump
+import pandera as pa
 
 @click.command()
 @click.argument("input_csv")
@@ -13,6 +14,7 @@ from joblib import dump
 @click.option('--input_csv', type=str, help="Path of raw csv")
 @click.option('--output_path', type=str, help="Path of processed train/test split")
 @click.option('--output_preprocessor', type=str, help="Path of fitted preprocessor")
+
 def main(input_csv, output_path, output_preprocessor):
     """
     Preprocesses the data to be used in exploratory data analysis.
@@ -20,7 +22,6 @@ def main(input_csv, output_path, output_preprocessor):
     df = pd.read_csv(input_csv)
 
     # Clean Data
-
     X = df[['subject_age', 'subject_income_category', 'married', 'relationship_duration', 'children']].copy()
     y = df['relationship_quality']
 
@@ -34,10 +35,36 @@ def main(input_csv, output_path, output_preprocessor):
         ['under_5k', '5k_7k', '7k_10k', '10k_12k', '12k_15k', '15k_20k', '20k_25k', '25k_30k', '30k_35k', '35k_40k', '40k_50k', '50k_60k', '60k_75k', '75k_85k', '85k_100k', '100k_125k', '125k_150k', '150k_175k', '175k_200k', '200k_250k', 'over_250k'], ordered = True 
     )
 
+    # validation check 5: check that the input predictor features and the target have the correct datatypes after cleaning 
+    schema_X = pa.DataFrameSchema(
+        {
+            'subject_age': pa.Column(int),
+            'subject_income_category': pa.Column(pa.Category),
+            'married': pa.Column(str),
+            'relationship_duration': pa.Column(float), # allow < 5% nulls naturally
+            'children': pa.Column(int)
+        }
+    )
+
+    # got syntax help for SeriesSchema from: https://pandera.readthedocs.io/en/stable/series_schemas.html
+    schema_Y = pa.SeriesSchema(
+        str,
+        name = 'relationship_quality'
+    )
+
+    # validate the datatypes before splitting the data into train and test
+    validated_X = schema_X.validate(X)
+    validated_y = schema_Y.validate(y)
+
     # split data into train and test split
     X_train, X_test, y_train, y_test = train_test_split(
-        X, y, test_size = 0.2, random_state = 123
+        validated_X, validated_y, test_size = 0.2, random_state = 123
     )
+
+    # save the cleaned csv
+    out_path = Path(output_path)
+    out_path.parent.mkdir(parents=True, exist_ok=True)
+    df.to_csv(out_path, index=False)
 
     # after train_test_split
     X_train_path = Path(output_path).parent / "X_train.csv"
@@ -66,13 +93,6 @@ def main(input_csv, output_path, output_preprocessor):
     )
 
     preprocessor.fit(X_train)
-
-
-
-    # save the cleaned csv
-    out_path = Path(output_path)
-    out_path.parent.mkdir(parents=True, exist_ok=True)
-    df.to_csv(out_path, index=False)
 
     # save the fitted preprocessor
     dump(preprocessor, output_preprocessor)
