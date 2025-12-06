@@ -1,0 +1,576 @@
+---
+title: Predicting Relationship Quality from Relationship Attributes in 2022
+jupyter: python3
+authors: Jasjot Parmar, Eugene Tse, Jade Chen, and Johnson Leung
+execute:
+    echo: False 
+format:
+    html:
+        toc: true 
+editor: source 
+bibliography: references.bib
+---
+
+```{python}
+import numpy as np
+import pandas as pd
+import matplotlib.pyplot as plt
+import seaborn as sns
+from sklearn.preprocessing import OneHotEncoder, OrdinalEncoder, StandardScaler
+from sklearn.compose import make_column_transformer
+import os
+from pathlib import Path
+import pandera.pandas as pa
+import pointblank as pb
+
+
+### Load and Save Data
+#We start by reading in the data using a pandas dataframe from the diversedata CRAN package directly through the raw CSV URL: `https://cran.r-project.org/incoming/UL/diversedata/data-clean/hcmst.csv`. We then download a copy of the dataset to the `data` directory.
+
+url = "https://cran.r-project.org/incoming/UL/diversedata/data-clean/hcmst.csv"
+raw_hcmst = pd.read_csv(url).dropna(subset = ['relationship_duration'])
+```
+
+# Summary 
+
+In this project, we used a dataset on based on survey responses to common relationship questions to develop a logistic regression model to classify relationships into one of five relationship quality statuses: excellent, good, fair, poor, or very poor. The model developed below uses common relationship-based features such as whether the subject is married or not and how many children the subject hsa in the relationship.
+
+# Introduction 
+
+Relationship quality classification is an important topic for couples to be aware of, particularly when trying to maximize the amount of satisfaction each partner recieves from the relationship. Accurate relationship quality classification allows couples in relationships to assess the quality of their relationship to develop better targeted strategies to improve or maintain that relationship quality. It is often difficult for couples to estimate the perceived quality of their relationship, so we investigate below if our machine learning model can correctly classify the quality of a relationshup, based on common relationship attributes. The below analysis tries to answer: How well do relationship characteristics such as age, income category, marital status, relationship duration, and number of children predict relationship quality?
+
+The dataset contains `{python} len(raw_hcmst)` survey responses of common relationship characteristics such as the income category of the respondent and their estimated relationship quality (our target to predict). This dataset (@diversedatahub) is originally based on the How Couples Meet and Stay Together survey (@hcmst_data_stanford). We accessed the CSV version of this dataset directly from CRAN (@cran_hcmst). The README.md file contains seperate conda lock files that explain how to run the environment if you want to run the code. We used principles from the Reproducible and Trustworthy Workflows for Data Science textbook (@conda_lock_mds) on conda lock files to manage enviornments. 
+
+In our analysis below, we investigate whether a logistic regression model can correctly classify relationship attributes into one of five relationship quality statuses: excellent, good, fair, poor, or very poor.
+
+```{python}
+# create data directory if it does not exist 
+os.makedirs("data/raw/", exist_ok = True)
+
+output_path = "data/raw/hcmst.csv"
+
+raw_hcmst.to_csv(output_path, index = False)
+
+cols_of_interest = ['subject_age', 'subject_income_category', 'married', 'relationship_duration', 'children', 'relationship_quality']
+
+
+
+#### Data Validation 1: Correct data file format
+
+# check file exists
+p = Path("data/raw/hcmst.csv")
+if not p.exists():
+    raise FileNotFoundError(f"data file not found at {p.resolve()}")
+
+# check correct extension
+if p.suffix.lower() != ".csv":
+    raise ValueError(f"expected '.csv' extension, got {p.suffix}")
+
+# read file
+hcmst = pd.read_csv(p)
+
+# use pandera to validate that this object is a dataframe
+file_schema = pa.DataFrameSchema({})
+hcmst = file_schema.validate(hcmst)
+
+#### Data Validation 2: Correct column names
+
+expected_columns = [
+    "subject_age",
+    "subject_education",
+    "subject_sex",
+    "subject_ethnicity",
+    "subject_income_category",
+    "subject_employment_status",
+    "same_sex_couple",
+    "married",
+    "sex_frequency",
+    "flirts_with_partner",
+    "fights_with_partner",
+    "relationship_duration",
+    "children",
+    "rel_change_during_pandemic",
+    "inc_change_during_pandemic",
+    "subject_had_covid",
+    "partner_had_covid",
+    "subject_vaccinated",
+    "partner_vaccinated",
+    "agree_covid_approach",
+    "relationship_quality",
+]
+
+actual_columns = list(hcmst.columns)
+if set(actual_columns) != set(expected_columns):
+    raise ValueError(
+        f"unexpected columns.\nexpected:\n{expected_columns}\n\nfound:\n{actual_columns}"
+    )
+column_schema = pa.DataFrameSchema(
+    {
+        name: pa.Column(nullable=True)  # missingness is checked later
+        for name in expected_columns
+    },
+    strict=True  # fail if there are extra columns
+)
+
+hcmst = column_schema.validate(hcmst)
+
+#### Data Validation 3: No empty observations
+
+no_empty_rows_schema = pa.DataFrameSchema(
+    {},  # column rules checked earlier
+    checks=[
+        pa.Check(
+            lambda df: not (df.isna().all(axis=1)).any(),
+            error="found at least one completely empty row in hcmst"
+        )
+    ]
+)
+
+hcmst = no_empty_rows_schema.validate(hcmst)
+
+#### Data Validation 4: Missingness not beyond expected threshold
+
+# **Note**: The missingness validation in the next cell is applied **only to the columns used in the model** (`subject_age`, `subject_income_category`, `married`, `relationship_duration`, `children`, `relationship_quality`). 
+
+missing_threshold = 0.05
+
+cols_to_check_missing = [
+    "subject_age",
+    "subject_income_category",
+    "married",
+    "relationship_duration",
+    "children",
+    "relationship_quality",
+]
+
+missingness_schema = pa.DataFrameSchema(
+    {
+        col: pa.Column(
+            nullable=True,
+            checks=pa.Check(
+                lambda s: s.isna().mean() <= missing_threshold,
+                element_wise=False,
+                error=(
+                    f"column '{col}' has more than "
+                    f"{missing_threshold:.0%} missing values"
+                ),
+            ),
+        )
+        for col in cols_to_check_missing
+    }
+)
+
+hcmst = missingness_schema.validate(hcmst)
+
+#### Data Validation 5: See below
+
+#### Data Validation 6: Check for Duplicate Rows
+
+# check for duplicate rows using the rows_distinct() function. Got syntax help from: https://posit-dev.github.io/pointblank/reference/Validate.rows_distinct.html#pointblank.Validate.rows_distinct
+pb.Validate(
+    data = hcmst
+).rows_distinct().interrogate()
+
+```
+
+```{python}
+#| ExecuteTime: {end_time: '2025-11-29T07:09:05.862746Z', start_time: '2025-11-29T07:09:05.589481Z'}
+#### Data Validation 7: Check for Outliers
+
+# **Note**: The below outlier validation in the next cell is applied **only to the columns used in the model** (`subject_age`, `subject_income_category`, `married`, `relationship_duration`, `children`, `relationship_quality`). 
+
+# '''
+# Perform checks to confirm that outliers do not exist in the data.
+# - subject_age should be between reasonable range, from 0 to 117 (oldest person in world)
+# - subject_income_category should contain values in the existing income_order list above
+# - married should contain values in {married, not_married}
+# - relationship_duration should contain values >= 0 
+# - children should contain values > 0 and < 80
+# - relationship_quality should contain values in: {excellent, good, fair, poor, very_poor}
+
+# Used the following for syntax help for col_vals_between: https://posit-dev.github.io/pointblank/reference/Validate.col_vals_between.html#pointblank.Validate.col_vals_between
+# Used the following link for syntax for col_vals_in_set: https://posit-dev.github.io/pointblank/reference/Validate.col_vals_in_set.html#pointblank.Validate.col_vals_in_set
+# Used the following link for syntax help to check if relationship_duration >= threshold: https://posit-dev.github.io/pointblank/reference/Validate.col_vals_ge.html
+# '''
+
+
+income_order = [
+    'under_5k',
+    '5k_7k',
+    '7k_10k',
+    '10k_12k',
+    '12k_15k',
+    '15k_20k',
+    '20k_25k',
+    '25k_30k',
+    '30k_35k',
+    '35k_40k',
+    '40k_50k',
+    '50k_60k',
+    '60k_75k',
+    '75k_85k',
+    '85k_100k',
+    '100k_125k',
+    '125k_150k',
+    '150k_175k',
+    '175k_200k',
+    '200k_250k',
+    'over_250k'
+]
+
+# check for outliers by checking if ranges are in between the above or if str columns are within the allowed set 
+outlier_validation = pb.Validate(data = hcmst) \
+    .col_vals_between(
+        columns = 'subject_age',
+        left = 0,
+        right = 117
+    ).col_vals_in_set(
+        columns = 'subject_income_category',
+        set = income_order
+    ).col_vals_in_set(
+        columns = 'married',
+        set = ['married', 'not_married']
+    ).col_vals_ge(
+        columns = 'relationship_duration',
+        value = 0
+    ).col_vals_between(
+        columns = 'children',
+        left = 0,
+        right = 80
+    ).col_vals_in_set(
+        columns = 'relationship_quality',
+        set = ['excellent', 'good', 'fair', 'poor', 'very_poor']
+).interrogate()
+
+outlier_validation
+
+#### Data Validation 8: Correct category levels
+
+object_column_level = (pb.Validate(data = hcmst)
+                       .col_vals_in_set(columns = 'subject_income_category',
+                                        set = income_order)
+                       .col_vals_in_set(columns = 'married', set = ['married', 'not_married'])
+                       .col_vals_in_set(columns = 'relationship_quality', set = ['excellent', 'good', 'fair', 'poor', 'very_poor'])
+).interrogate()
+object_column_level
+
+#### Data Validation 9: Target/response variable follows expected distribution
+
+response_distribution = pb.Validate(data = hcmst).col_vals_expr(
+    expr=lambda df: (
+            df["relationship_quality"].value_counts(normalize=True).get("excellent", 0) <= 0.6
+            and
+            df["relationship_quality"].value_counts(normalize=True).get("good", 0) <= 0.4
+            and
+            df["relationship_quality"].value_counts(normalize=True).get("fair", 0) <= 0.2
+            and
+            df["relationship_quality"].value_counts(normalize=True).get("poor", 0) <= 0.2
+            and
+            df["relationship_quality"].value_counts(normalize=True).get("very_poor", 0) <= 0.2
+    )
+).interrogate()
+response_distribution
+
+# Data validation 10: N.A.
+
+#### Data Validation 11: No anomalous correlations between features/explanatory variables
+
+def check_max_correlation(df):
+    corr_matrix = df.select_dtypes(include='number').corr().abs()
+    pairs = corr_matrix.unstack()
+    pairs = pairs[pairs < 1.0]
+    return pairs.max() < 0.90
+
+schema = pa.DataFrameSchema(
+    checks=pa.Check(
+        check_max_correlation,
+        error="High Multicollinearity detected (>0.90)."
+    )
+)
+
+hcmst = schema.validate(hcmst)
+
+# todo make sure the any changes to the hcmst is saved to data/processed (to separate the raw and preprocessed files)
+# create data directory if it does not exist 
+os.makedirs("data/processed/", exist_ok = True)
+
+hcmst.to_csv("data/processed/hcmst_clean.csv", index=False)
+```
+
+# EDA
+
+We start by inittially confirming our data was read in to a pandas DataFrame object, as shown in @tbl-initial-eda.
+
+```{python}
+#| label: tbl-initial-eda
+#| tbl-cap: Peek of demographic and relationship variables included in this analysis. 
+hcmst.head()
+```
+
+We can see from the distribution of the Relationship Quality categorical variable, that the dataset contains imbalanced classes, with a very large number of respondents reporting excellent or good relationship quality and a much lower number of respondents reporting fair, poor, and very poor relationship quality.
+
+![Relationship Quality Score Distributiom](../figures/dist-relationship-quality.png){#fig-relationship-quality-dist fig-pos="H"}
+
+```{python}
+#| eval: false
+# plot distribution of relationship quality with relationship quality on x axis and count on y axis
+sns.histplot(
+    data = hcmst,
+    x = 'relationship_quality', 
+    stat = 'count'
+).set_title('Distribution of Relationship Quality')
+```
+
+Our numeric predictor / input features show a high correlation between subject age and relationship duration with a $\rho$ value of `{python} round(hcmst['subject_age'].corr(hcmst['relationship_duration']), 3)`, which means that as the subject's age increases, their relationship duration increases. Subject age and (number of) children show a weak negative correlation of `{python} round(hcmst['subject_age'].corr(hcmst['children']), 3)`, indicating that as subject age increases, the reported number of children slightly decreases.
+
+![Correlation Heatmap](../figures/corr_plot.png){#fig-corr-plot fig-pos="H"}
+
+```{python}
+#| eval: false
+corr_mat = hcmst[['subject_age','relationship_duration', 'children']].corr()
+sns.heatmap(corr_mat, annot=True, cmap='coolwarm')
+plt.title('Correlation Matrix of Relevant Predictor Variables')
+```
+
+The distribution of income categories show that we have a left skewed distribution, with most respondents making over 50k per year. For respondents who earn >= 50k / year, income distribution between 50k and 250k+ seems to be roughly uniformly distributed, showing that there is a pretty even spread of incomes between respondents as income passes 50k.
+
+![Income Category Distribution](../figures/dist-income-category.png){#fig-income-category fig-pos="H"}
+
+```{python}
+#| eval: false
+hcmst['subject_income_category'] = pd.Categorical(hcmst['subject_income_category'], ordered = True, categories = income_order)
+sns.histplot(
+    data = hcmst,
+    x = 'subject_income_category',
+    bins = 23
+).set_title('Distribution of Income Category')
+
+plt.xticks(rotation = 45, ha = 'right')
+
+plt.tight_layout()
+```
+
+We then split up the data into the relationship features that we want to predict relationship quality with. Input features include: Subject Age, Subject Income Category, Martial Status, Relationship Duration, and Number of Children, before splitting the data into train and test splits. We then conduct simple data cleaning through changing relevant numeric features such as age and number of children into integers, before reordering the income category feature to be ordered in ascending order by income.
+
+```{python}
+#| ExecuteTime: {end_time: '2025-11-21T10:35:14.390980Z', start_time: '2025-11-21T10:35:14.376484Z'}
+# Clean Data
+from sklearn.model_selection import train_test_split
+
+X = hcmst[['subject_age', 'subject_income_category', 'married', 'relationship_duration', 'children']].copy()
+y = hcmst['relationship_quality'].copy()
+
+# simple data cleaning - change subject age and children from floats to intgers 
+X['subject_age'] = X['subject_age'].astype(int)
+X['children'] = X['children'].astype(int)
+
+# reorder income category 
+X['subject_income_category'] = X['subject_income_category'].astype('category')
+X['subject_income_category'] = X['subject_income_category'].cat.reorder_categories(
+    ['under_5k', '5k_7k', '7k_10k', '10k_12k', '12k_15k', '15k_20k', '20k_25k', '25k_30k', '30k_35k', '35k_40k', '40k_50k', '50k_60k', '60k_75k', '75k_85k', '85k_100k', '100k_125k', '125k_150k', '150k_175k', '175k_200k', '200k_250k', 'over_250k'], ordered = True 
+)
+```
+
+```{python}
+# validation check: check that the input predictor features and the target have the correct datatypes after cleaning 
+schema_X = pa.DataFrameSchema(
+    {
+        'subject_age': pa.Column(int),
+        'subject_income_category': pa.Column(pa.Category),
+        'married': pa.Column(str),
+        'relationship_duration': pa.Column(float), # allow < 5% nulls naturally
+        'children': pa.Column(int)
+    }
+)
+
+# got syntax help for SeriesSchema from: https://pandera.readthedocs.io/en/stable/series_schemas.html
+schema_Y = pa.SeriesSchema(
+    str,
+    name = 'relationship_quality'
+)
+
+# validate the datatypes before splitting the data into train and test
+validated_X = schema_X.validate(X)
+validated_y = schema_Y.validate(y)
+
+# split data into train and test split
+X_train, X_test, y_train, y_test = train_test_split(
+    validated_X, validated_y, test_size = 0.2, random_state = 123
+)
+```
+
+Numeric features have different scales, with age having much larger values than relationship duration and number of children. Therefore, Standard Scaler is applied to numeric features so all numeric features contribute equally to the logistic regression model. Ordinal features such as subject income category are converted to ordinal categories, as their categories have an order based on the income of the subject. Categorical features such as marital status are one hot encoded, resulting in one column indicating martial status or not (0 / 1). Each transformation is wrapped in a column transformer.
+
+```{python}
+#| ExecuteTime: {end_time: '2025-11-21T10:35:14.460871Z', start_time: '2025-11-21T10:35:14.446779Z'}
+# preprocess the data by applying the appropriate transformations to each
+numeric_features = ['subject_age', 'relationship_duration', 'children']
+ordinal_features = ['subject_income_category']
+categorical_features = ['married']
+
+# create a column transformer that applies transformations to each type of feature
+preprocessor = make_column_transformer(
+    (StandardScaler(), numeric_features),
+    (OneHotEncoder(drop='if_binary'), categorical_features),
+    (OrdinalEncoder(), ordinal_features)
+)
+
+```
+
+A scikit-learn pipeline is used to preprocess and train the model on the training data in one step. The pipeline first applies the preprocessor above to the training set to standardize numeric features and one hot encodes categorical features, before training the Logistic Regression model. The Logistic Regression model addresses our above issue regarding the class imbalance in relationship quality by giving the minority class a bigger penalty, so the model pays more attention to that observation
+
+```{python}
+#| ExecuteTime: {end_time: '2025-11-21T10:35:14.562364Z', start_time: '2025-11-21T10:35:14.478682Z'}
+# fit model
+from sklearn.linear_model import LogisticRegression
+from sklearn.pipeline import make_pipeline
+
+logreg = make_pipeline(preprocessor, LogisticRegression(max_iter=1000, class_weight='balanced'))
+logreg.fit(X_train, y_train)
+```
+
+```{python}
+#| ExecuteTime: {end_time: '2025-11-21T10:35:14.826525Z', start_time: '2025-11-21T10:35:14.620566Z'}
+# training confusion matrix
+from sklearn.metrics import ConfusionMatrixDisplay
+ConfusionMatrixDisplay.from_estimator(logreg, X_train, y_train)
+plt.grid(False)
+plt.title('Confusion Matrix of Logistic Regression using training data')
+
+cm_display_train = ConfusionMatrixDisplay.from_estimator(logreg, X_train, y_train)
+cm_train = cm_display_train.confusion_matrix
+
+precisions_train = np.diag(cm_train) / np.sum(cm_train, axis = 0)
+recalls_train = np.diag(cm_train) / np.sum(cm_train, axis = 1)
+
+# get the precision and recall for each class precision = (each diagonal (true postiives for each class / sum of the columns (TP + FP) recall = (each diagonal: true positives for each class / sums of that row)
+
+excellent_recall_train = recalls_train[0]
+fair_recall_train = recalls_train[1]
+good_recall_train = recalls_train[2]
+poor_recall_train = recalls_train[3]
+very_poor_recall_train = recalls_train[4]
+
+excellent_precision_train = precisions_train[0]
+fair_precision_train = precisions_train[1]
+good_precision_train = precisions_train[2]
+poor_precision_train = precisions_train[3]
+very_poor_precision_train = precisions_train[4]
+
+```
+
+To see how our model did on predicting relationship quality based on the training data, we plot a confusion matrix. We see that for respondents with excellent relationship quality, the model only correctly predicts `{python} round(excellent_recall_train * 100, 1)`% of relationships that have excellent relationship quality correctly (Recall = `{python} excellent_recall_train`). Of all relationships that are predicted to have excellent relationship quality,the model correctly predicts `{python} round(excellent_precision_train * 100, 1)`% of them (Precision = `{python} round(excellent_precision_train, 3)`).
+
+For respondents with Good relationship quality, the model only correctly predicts `{python} round(good_recall_train * 100, 1)`% of them. For all relationships that are predicted to have good relationship quality, the model correctly predicts `{python} round(good_precision_train * 100, 1)`% of them. 
+
+For respondents with Fair relationship quality, the model only correctly predicts `{python} round(fair_recall_train * 100, 1)`% of them. Of all relationships that are predicted to have Fair relationship quality, the model correctly predicts `{python} round(fair_precision_train * 100, 1)`% of them.
+
+For respondents with Poor relationship quality, the model correctly predicts `{python} round(poor_recall_train * 100, 1)`% of them. For all relationships that are predicted to have Poor relationship quality, the model only correctly predicts `{python} round(poor_precision_train * 100, 1)`% of them. 
+
+For respondents with Very Poor relationship quality, the model correctly predicts `{python} round(very_poor_recall_train * 100, 1)`% of them (there are very few observations with very poor relationship quality so this prediction should be used carefully). Out of all relationships that are predicted to have very poor relationship quality, the model correctly predicts only `{python} round(very_poor_precision_train * 100, 1)`% of them.
+
+```{python}
+#| ExecuteTime: {end_time: '2025-11-21T10:35:15.047369Z', start_time: '2025-11-21T10:35:14.883024Z'}
+# testing confusion matrix
+ConfusionMatrixDisplay.from_estimator(logreg, X_test, y_test)
+plt.grid(False)
+plt.title('Confusion Matrix of Logistic Regression using testing data')
+
+cm_display_test = ConfusionMatrixDisplay.from_estimator(logreg, X_test, y_test)
+
+cm_test = cm_display_test.confusion_matrix
+
+precisions_test = np.diag(cm_test) / np.sum(cm_test, axis = 0)
+recalls_test = np.diag(cm_test) / np.sum(cm_test, axis = 1)
+
+# get the precision and recall for each class precision = (each diagonal (true postiives for each class / sum of the columns (TP + FP) recall = (each diagonal: true positives for each class / sums of that row)
+plt.grid(False)
+plt.title('Confusion Matrix of Logistic Regression using training data')
+
+excellent_recall_test = recalls_test[0]
+fair_recall_test = recalls_test[1]
+good_recall_test = recalls_test[2]
+poor_recall_test = recalls_test[3]
+very_poor_recall_test = recalls_test[4]
+
+excellent_precision_test = precisions_test[0]
+fair_precision_test = precisions_test[1]
+good_precision_test = precisions_test[2]
+poor_precision_test = precisions_test[3]
+very_poor_precision_test = precisions_test[4]
+
+# find total accuracy on test set (sum of TPs) over entire sum of matrix
+accuracy_test_cm = np.diag(cm_test).sum() / cm_test.sum()
+```
+
+To see how our model did on predicting relationship quality based on the testing set, we plot a confusion matrix for predictions on the test set. We see that for respondents with excellent relationship quality, the model only correctly predicts `{python} round(excellent_recall_test * 100, 1)`% of relationships that have excellent relationship quality correctly (Recall = `{python} round(excellent_recall_test, 3)`). Of all relationships that are predicted to have excellent relationship quality,the model correctly predicts `{python} round(excellent_precision_test * 100, 1)`% of them (Precision = `{python} round(excellent_precision_test, 3)`).
+
+For respondents with Good relationship quality, the model only correctly predicts `{python} round(good_recall_test * 100, 1)`% of them. For all relationships that are predicted to have good relationship quality, the model correctly predicts `{python} round(good_precision_test * 100, 1)`% of them. 
+
+For respondents with Fair relationship quality, the model only correctly predicts `{python} round(fair_recall_test * 100, 1)`% of them. Of all relationships that are predicted to have Fair relationship quality, the model correctly predicts `{python} round(fair_precision_test * 100, 1)`% of them.
+
+For respondents with Poor relationship quality, the model correctly predicts `{python} round(poor_recall_test * 100, 1)`% of them, as there is only 1 poor relationship quality observation in the test set. For all relationships that are predicted to have Poor relationship quality, the model only correctly predicts `{python} round(poor_precision_test * 100, 1)`% of them, since the model predicted an observation to have Poor relationship quality 0 times.
+
+For respondents with Very Poor relationship quality, the model correctly predicts `{python} round(very_poor_recall_test * 100, 1)`% of them. Out of all relationships that are predicted to have very poor relationship quality, the model only correctly predicts `{python} round(very_poor_precision_test * 100, 1)`% of them.
+
+```{python}
+#| ExecuteTime: {end_time: '2025-11-21T10:35:15.061191Z', start_time: '2025-11-21T10:35:15.051388Z'}
+# micro-average auc roc
+from sklearn.metrics import roc_auc_score
+y_score = logreg.predict_proba(X_test)
+micro_roc_auc_ovr = roc_auc_score(
+    y_test,
+    y_score,
+    multi_class="ovr",
+    average="micro",
+)
+
+print(f"Micro-averaged One-vs-Rest ROC AUC score:\n{micro_roc_auc_ovr:.2f}")
+```
+
+```{python}
+#| eval: false
+#| ExecuteTime: {end_time: '2025-11-21T10:35:15.211438Z', start_time: '2025-11-21T10:35:15.068244Z'}
+# micro-averaged auc roc plot
+from sklearn.metrics import RocCurveDisplay
+from sklearn.preprocessing import LabelBinarizer
+label_binarizer = LabelBinarizer().fit(y_train)
+y_onehot_test = label_binarizer.transform(y_test)
+
+display = RocCurveDisplay.from_predictions(
+    y_onehot_test.ravel(),
+    y_score.ravel(),
+    name="micro-average OvR",
+    curve_kwargs=dict(color="darkorange"),
+    plot_chance_level=True,
+    despine=True,
+)
+_ = display.ax_.set(
+    xlabel="False Positive Rate",
+    ylabel="True Positive Rate",
+    title="Micro-averaged One-vs-Rest\nReceiver Operating Characteristic",
+)
+```
+
+Our micro-averaged ROC curve above shows a AUC of `{python} round(micro_roc_auc_ovr, 3)`. This means that our model is not the strongest at correctly predicting relationship quality based on the input relationship features we specified above. The ROC curve shows that our model is only slightly better than randomly guessing the relationship quality class, meaning that our model's accuracy is pretty weak.
+
+# Discussion:
+
+Our findings above indicate a poor overall accuracies across each class on the testing set, with an overall test accuracy from the confusion matrix of `{python} round(accuracy_test_cm * 100, 1)`% meaning that the model is poor at predicting the correct relationship quality based on features such as age, income_category, marital status, relationship duration, and number of children. We also see that the precision and recall of each relationship quality class is quite low in the training and testing set. Our poor accuracy, precision, and recall for all relationship quality classes tells us that with a Logistic Regression model, the features we included (age, income category, marital status, relationship duration, and number of children) do not predict relationship quality well.
+
+This is generally what we expected to find because the features we chose are mostly external or demographic traits about the relationship that one can argue, do not define the emotional or personal status of a relationship. Since our features do not include deeper characteristics that could matter more for relationship quality compared to demographic features like age, it makes sense our Logistic Regression model is performing poorly.
+
+These findings could change how people in relationships and researchers think about what defines relationship quality. Since our above results show that demographic or external features like age, number of children, income category, and relationship duration were not good predictors of relationship quality with our Logistic Regression model, people could place less focus on these relationship features when gauging the relationship quality of their own relationship. The results could lead to people in relationships placing more importance on emotional or behavioural metrics in relationships instead like how often partners openly communicate about problems. These emotional and behavioural relationship features could be much better predictors of relationship quality. These results could ultimately impact how relationship quality is assessed, by changing the focus to deeper personal relationship dynamics instead of surface level demographic features.
+
+The future questions our above results could lead to are:
+
+- What emotional or personal relationship features (that relate to both partners) best predict relationship quality?
+
+- Could using a dataset that contains data for relationship matrics from both partners in the relationship improve accuracy of our above Logisitc Regression model?
+
+- How much better (or worse) would non-linear models such as decision trees perform on the same above dataset?
+
+- Which relationship features that we used above contribute most to predicting relationship quality? 
+
+# References
+
