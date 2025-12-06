@@ -33,7 +33,7 @@ def main(data_file, figure_path):
     # ensuring output directory exists
     output_prefix.parent.mkdir(parents=True, exist_ok=True)
 
-    # 1. Load preprocessed data from 03-preprocessing.py
+    # 1. ;oad preprocessed data from 03-preprocessing.py
     # expecting a joblib file with data["X_train"], data["X_test"], data["y_train"], data["y_test"]
     data = joblib.load(input_path)
 
