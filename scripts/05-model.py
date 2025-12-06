@@ -92,7 +92,7 @@ def main(data_file, figure_path):
 
     # print to console for sanity checks
     print(
-        f"micro-averaged one v rest roc-auc score:\n"
+        f"micro avged one v rest roc-auc score:\n"
         f"{micro_roc_auc_ovr:.2f}"
     )
 
