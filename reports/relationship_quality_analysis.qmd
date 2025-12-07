@@ -326,7 +326,7 @@ sns.histplot(
 ).set_title('Distribution of Relationship Quality')
 ```
 
-Our numeric predictor / input features show a high correlation between subject age and relationship duration with a $\rho$ value of `{python} round(hcmst['subject_age'].corr(hcmst['relationship_duration']), 3)`, which means that as the subject's age increases, their relationship duration increases. Subject age and (number of) children show a weak negative correlation of `{python} round(hcmst['subject_age'].corr(hcmst['children']), 3)`, indicating that as subject age increases, the reported number of children slightly decreases.
+Our numeric predictor / input features show a high correlation between subject age and relationship duration with a $\rho$ value of `{python} float(round(hcmst['subject_age'].corr(hcmst['relationship_duration']), 3))`, which means that as the subject's age increases, their relationship duration increases. Subject age and (number of) children show a weak negative correlation of `{python} float(round(hcmst['subject_age'].corr(hcmst['children']), 3))`, indicating that as subject age increases, the reported number of children slightly decreases.
 
 ![Correlation Heatmap](../figures/corr_plot.png){#fig-corr-plot fig-pos="H"}
 
@@ -462,15 +462,15 @@ very_poor_precision_train = precisions_train[4]
 
 ```
 
-To see how our model did on predicting relationship quality based on the training data, we plot a confusion matrix @fig-cm-train. We see that for respondents with excellent relationship quality, the model only correctly predicts `{python} round(excellent_recall_train * 100, 1)`% of relationships that have excellent relationship quality correctly (Recall = `{python} excellent_recall_train`). Of all relationships that are predicted to have excellent relationship quality,the model correctly predicts `{python} round(excellent_precision_train * 100, 1)`% of them (Precision = `{python} round(excellent_precision_train, 3)`).
+To see how our model did on predicting relationship quality based on the training data, we plot a confusion matrix @fig-cm-train. We see that for respondents with excellent relationship quality, the model only correctly predicts `{python} float(round(excellent_recall_train * 100, 1))`% of relationships that have excellent relationship quality correctly (Recall = `{python} float(round(excellent_recall_train, 3))`). Of all relationships that are predicted to have excellent relationship quality,the model correctly predicts `{python} float(round(excellent_precision_train * 100, 1))`% of them (Precision = `{python} float(round(excellent_precision_train, 3))`).
 
-For respondents with Good relationship quality, the model only correctly predicts `{python} round(good_recall_train * 100, 1)`% of them. For all relationships that are predicted to have good relationship quality, the model correctly predicts `{python} round(good_precision_train * 100, 1)`% of them. 
+For respondents with Good relationship quality, the model only correctly predicts `{python} float(round(good_recall_train * 100, 1))`% of them. For all relationships that are predicted to have good relationship quality, the model correctly predicts `{python} float(round(good_precision_train * 100, 1))`% of them. 
 
-For respondents with Fair relationship quality, the model only correctly predicts `{python} round(fair_recall_train * 100, 1)`% of them. Of all relationships that are predicted to have Fair relationship quality, the model correctly predicts `{python} round(fair_precision_train * 100, 1)`% of them.
+For respondents with Fair relationship quality, the model only correctly predicts `{python} float(round(fair_recall_train * 100, 1))`% of them. Of all relationships that are predicted to have Fair relationship quality, the model correctly predicts `{python} float(round(fair_precision_train * 100, 1))`% of them.
 
-For respondents with Poor relationship quality, the model correctly predicts `{python} round(poor_recall_train * 100, 1)`% of them. For all relationships that are predicted to have Poor relationship quality, the model only correctly predicts `{python} round(poor_precision_train * 100, 1)`% of them. 
+For respondents with Poor relationship quality, the model correctly predicts `{python} float(round(poor_recall_train * 100, 1))`% of them. For all relationships that are predicted to have Poor relationship quality, the model only correctly predicts `{python} float(round(poor_precision_train * 100, 1))`% of them. 
 
-For respondents with Very Poor relationship quality, the model correctly predicts `{python} round(very_poor_recall_train * 100, 1)`% of them (there are very few observations with very poor relationship quality so this prediction should be used carefully). Out of all relationships that are predicted to have very poor relationship quality, the model correctly predicts only `{python} round(very_poor_precision_train * 100, 1)`% of them.
+For respondents with Very Poor relationship quality, the model correctly predicts `{python} float(round(very_poor_recall_train * 100, 1))`% of them (there are very few observations with very poor relationship quality so this prediction should be used carefully). Out of all relationships that are predicted to have very poor relationship quality, the model correctly predicts only `{python} float(round(very_poor_precision_train * 100, 1))`% of them.
 
 ![Confusion Matrix Training Data](../figures/model_confusion_train.png){#fig-cm-train fig-pos="H"}
 
@@ -502,15 +502,15 @@ very_poor_precision_test = precisions_test[4]
 accuracy_test_cm = np.diag(cm_test).sum() / cm_test.sum()
 ```
 
-To see how our model did on predicting relationship quality based on the testing set @fig-cm-test, we plot a confusion matrix for predictions on the test set. We see that for respondents with excellent relationship quality, the model only correctly predicts `{python} round(excellent_recall_test * 100, 1)`% of relationships that have excellent relationship quality correctly (Recall = `{python} round(excellent_recall_test, 3)`). Of all relationships that are predicted to have excellent relationship quality,the model correctly predicts `{python} round(excellent_precision_test * 100, 1)`% of them (Precision = `{python} round(excellent_precision_test, 3)`).
+To see how our model did on predicting relationship quality based on the testing set @fig-cm-test, we plot a confusion matrix for predictions on the test set. We see that for respondents with excellent relationship quality, the model only correctly predicts `{python} float(round(excellent_recall_test * 100, 1))`% of relationships that have excellent relationship quality correctly (Recall = `{python} float(round(excellent_recall_test, 3))`). Of all relationships that are predicted to have excellent relationship quality,the model correctly predicts `{python} float(round(excellent_precision_test * 100, 1))`% of them (Precision = `{python} float(round(excellent_precision_test, 3))`).
 
-For respondents with Good relationship quality, the model only correctly predicts `{python} round(good_recall_test * 100, 1)`% of them. For all relationships that are predicted to have good relationship quality, the model correctly predicts `{python} round(good_precision_test * 100, 1)`% of them. 
+For respondents with Good relationship quality, the model only correctly predicts `{python} float(round(good_recall_test * 100, 1))`% of them. For all relationships that are predicted to have good relationship quality, the model correctly predicts `{python} float(round(good_precision_test * 100, 1))`% of them. 
 
-For respondents with Fair relationship quality, the model only correctly predicts `{python} round(fair_recall_test * 100, 1)`% of them. Of all relationships that are predicted to have Fair relationship quality, the model correctly predicts `{python} round(fair_precision_test * 100, 1)`% of them.
+For respondents with Fair relationship quality, the model only correctly predicts `{python} float(round(fair_recall_test * 100, 1))`% of them. Of all relationships that are predicted to have Fair relationship quality, the model correctly predicts `{python} float(round(fair_precision_test * 100, 1))`% of them.
 
-For respondents with Poor relationship quality, the model correctly predicts `{python} round(poor_recall_test * 100, 1)`% of them, as there is only 1 poor relationship quality observation in the test set. For all relationships that are predicted to have Poor relationship quality, the model only correctly predicts `{python} round(poor_precision_test * 100, 1)`% of them, since the model predicted an observation to have Poor relationship quality 0 times.
+For respondents with Poor relationship quality, the model correctly predicts `{python} float(round(poor_recall_test * 100, 1))`% of them, as there is only 1 poor relationship quality observation in the test set. For all relationships that are predicted to have Poor relationship quality, the model only correctly predicts `{python} float(round(poor_precision_test * 100, 1))`% of them, since the model predicted an observation to have Poor relationship quality 0 times.
 
-For respondents with Very Poor relationship quality, the model correctly predicts `{python} round(very_poor_recall_test * 100, 1)`% of them. Out of all relationships that are predicted to have very poor relationship quality, the model only correctly predicts `{python} round(very_poor_precision_test * 100, 1)`% of them.
+For respondents with Very Poor relationship quality, the model correctly predicts `{python} float(round(very_poor_recall_test * 100, 1))`% of them. Out of all relationships that are predicted to have very poor relationship quality, the model only correctly predicts `{python} float(round(very_poor_precision_test * 100, 1))`% of them.
 
 ![Confusion Matrix Test Data](../figures/model_confusion_test.png){#fig-cm-test fig-pos="H"}
 
@@ -553,13 +553,13 @@ _ = display.ax_.set(
 )
 ```
 
-Our micro-averaged ROC curve (@fig-roc) above shows a AUC of `{python} round(micro_roc_auc_ovr, 3)`. This means that our model is not the strongest at correctly predicting relationship quality based on the input relationship features we specified above. The ROC curve shows that our model is only slightly better than randomly guessing the relationship quality class, meaning that our model's accuracy is pretty weak.
+Our micro-averaged ROC curve (@fig-roc) above shows a AUC of `{python} float(round(micro_roc_auc_ovr, 3))`. This means that our model is not the strongest at correctly predicting relationship quality based on the input relationship features we specified above. The ROC curve shows that our model is only slightly better than randomly guessing the relationship quality class, meaning that our model's accuracy is pretty weak.
 
 ![ROC Curve](../figures/model_roc_micro_ovr.png){#fig-roc fig-pos="H"}
 
 # Discussion:
 
-Our findings above indicate a poor overall accuracies across each class on the testing set, with an overall test accuracy from the confusion matrix of `{python} round(accuracy_test_cm * 100, 1)`% meaning that the model is poor at predicting the correct relationship quality based on features such as age, income_category, marital status, relationship duration, and number of children. We also see that the precision and recall of each relationship quality class is quite low in the training and testing set. Our poor accuracy, precision, and recall for all relationship quality classes tells us that with a Logistic Regression model, the features we included (age, income category, marital status, relationship duration, and number of children) do not predict relationship quality well.
+Our findings above indicate a poor overall accuracies across each class on the testing set, with an overall test accuracy from the confusion matrix of `{python} float(round(accuracy_test_cm * 100, 1))`% meaning that the model is poor at predicting the correct relationship quality based on features such as age, income_category, marital status, relationship duration, and number of children. We also see that the precision and recall of each relationship quality class is quite low in the training and testing set. Our poor accuracy, precision, and recall for all relationship quality classes tells us that with a Logistic Regression model, the features we included (age, income category, marital status, relationship duration, and number of children) do not predict relationship quality well.
 
 This is generally what we expected to find because the features we chose are mostly external or demographic traits about the relationship that one can argue, do not define the emotional or personal status of a relationship. Since our features do not include deeper characteristics that could matter more for relationship quality compared to demographic features like age, it makes sense our Logistic Regression model is performing poorly.
 
