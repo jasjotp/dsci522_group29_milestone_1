@@ -43,3 +43,7 @@ Discrimination, exclusion, or harassment of any kind is not acceptable.
 * A private warning from the group
 * Removal from specific tasks or responsibilities
 * Formal reporting to the instructor or TA
+
+### Reporting a violation
+
+If someone believes this Code of Conduct has been violated, concerns should be raised promptly. Contact the project lead or the course instructor (or TA, if appropriate) at jasjotparmar14@gmail.com with a clear description of the incident. Reports will be handled confidentially and addressed as quickly as possible.
