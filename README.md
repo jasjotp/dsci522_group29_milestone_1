@@ -28,16 +28,20 @@ View the rendered analysis here: https://jasjotp.github.io/relationship-quality-
 ## Repository Structure 📁
 
 ```         
+├── data/
+│   ├── raw/
+│   └── processed/
+├── figures/
+├── reports/
+├── scripts/
 ├── analysis.ipynb
-├── index.html
+├── Makefile
+├── environment.yml
+├── README.md
 ├── CODE_OF_CONDUCT.md
 ├── CONTRIBUTING.md
-├── data/
-      └── hcmst.csv
-├── environment.yml
-├── conda-lock.yml
 ├── LICENSE
-└── README.md
+└── index.html
 ```
 
 ------------------------------------------------------------------------
