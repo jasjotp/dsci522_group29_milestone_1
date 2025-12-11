@@ -54,15 +54,25 @@ View the rendered analysis here: https://jasjotp.github.io/relationship-quality-
 git clone git@github.com:jasjotp/relationship-quality-prediction.git
 ```
 
- ```cd relationship-quality-prediction```
+ ```
+ cd relationship-quality-prediction
+ ```
 
 ------------------------------------------------------------------------
 
 ## 2. Create the conda environment
 
-```conda env create -f environment.yml -n relationship-quality-prediction``` <br> 
-```conda activate relationship-quality-prediction``` <br>
-```conda install -c conda-forge conda-lock```
+```
+conda env create -f environment.yml -n relationship-quality-prediction
+```
+
+```
+conda activate relationship-quality-prediction
+```
+
+```
+conda install -c conda-forge conda-lock
+```
 
 ------------------------------------------------------------------------
 
@@ -70,7 +80,13 @@ git clone git@github.com:jasjotp/relationship-quality-prediction.git
 
 For reproducible installs:
 
-```conda-lock install -n relationship-quality-prediction conda-lock.yml``` <br> ```conda activate relationship-quality-prediction```
+```
+conda-lock install -n relationship-quality-prediction conda-lock.yml
+```
+
+```
+conda activate relationship-quality-prediction
+```
 
 ------------------------------------------------------------------------
 
@@ -80,25 +96,53 @@ For reproducible installs:
 
 Runs all steps: download, validate, preprocess, generate figures, and train the model.
 
-```make all```
+```
+make all
+```
 
 ### Individual steps
 
-1.  Download raw data ```make download```
-2.  Validate the raw data ```make validate```
-3.  Preprocess the data and generate train/test splits ```make preprocess```
-4.  Generate EDA figures ```make eda```
-5.  Train and evaluate model ```make model```
+1.  Download raw data 
+
+```
+make download
+```
+
+2.  Validate the raw data 
+
+```
+make validate
+```
+
+3.  Preprocess the data and generate train/test splits 
+
+```
+make preprocess
+```
+
+4.  Generate EDA figures 
+
+```
+make eda
+```
+
+5.  Train and evaluate model 
+
+```
+make model
+```
 
 ------------------------------------------------------------------------
 
 ## 5. Launch the Analysis Notebook
 
-Run<br>
+Run
 
-```jupyter lab```<br>
+```
+jupyter lab
+```
 
-Open the ```analysis.ipynb``` file to run the exploratory analysis and code.
+Open the `analysis.ipynb` file to run the exploratory analysis and code.
 
 ------------------------------------------------------------------------
 
@@ -126,7 +170,9 @@ quarto 1.8.26
 
 To update dependencies, modify `environment.yml` and regenerate the lockfile:
 
-```conda-lock -f environment.yml --lockfile conda-lock.yml```
+```
+conda-lock -f environment.yml --lockfile conda-lock.yml
+```
 
 ------------------------------------------------------------------------
 
