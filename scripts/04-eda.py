@@ -2,6 +2,8 @@ import pandas as pd
 import matplotlib.pyplot as plt
 import seaborn as sns
 import click
+from functions.plot_histogram import plot_histogram
+from functions.plot_corr import plot_corr
 
 @click.command()
 @click.argument("data_file", type=click.Path(exists=True))
@@ -11,21 +13,12 @@ import click
 def main(data_file, figure_path):
     hcmst = pd.read_csv(data_file)
 
-    sns.histplot(
-        data=hcmst,
-        x='relationship_quality',
-        stat='count'
-    ).set_title('Distribution of Relationship Quality')
-    plt.savefig(f'{figure_path}/dist-relationship-quality.png')
-    plt.close()
+    plot_histogram(hcmst, 'relationship_quality',
+                   f'{figure_path}/dist-relationship-quality.png',
+                   title='Distribution of Relationship Quality')
 
-    corr_mat = hcmst[['subject_age', 'relationship_duration', 'children']].corr()
-    sns.heatmap(corr_mat,
-                annot=True,
-                cmap='coolwarm'
-                ).set_title('Correlation Matrix of Relevant Predictor Variables')
-    plt.savefig(f'{figure_path}/corr_plot.png')
-    plt.close()
+    plot_corr(hcmst, f'{figure_path}/corr_plot.png',
+              title='Correlation Matrix of Relevant Predictor Variables')
 
     income_order = [
         'under_5k',
@@ -53,15 +46,11 @@ def main(data_file, figure_path):
     hcmst['subject_income_category'] = pd.Categorical(hcmst['subject_income_category'],
                                                       ordered=True,
                                                       categories=income_order)
-    sns.histplot(
-        data=hcmst,
-        x='subject_income_category',
-        bins=23
-    ).set_title('Distribution of Income Category')
-    plt.xticks(rotation=45, ha='right')
-    plt.tight_layout()
-    plt.savefig(f'{figure_path}/dist-income-category.png')
-    plt.close()
+
+    plot_histogram(hcmst, 'subject_income_category',
+                   f'{figure_path}/dist-income-category.png',
+                   title='Distribution of Income Category',
+                   bins=23)
 
 
 if __name__ == "__main__":
