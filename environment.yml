@@ -11,6 +11,7 @@ dependencies:
   - pip=25.3
   - pointblank=0.16.0
   - pandera=0.25.0
+  - pytest 9.0.2
   - click=8.3.1
-  - ipykernal=7.1.0
+  - ipykernel=7.1.0
   - quarto=1.8.26
