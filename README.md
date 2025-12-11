@@ -50,9 +50,7 @@ View the rendered analysis here: https://jasjotp.github.io/relationship-quality-
 
 ### 1.1. Clone the repository
 
-```
-git clone git@github.com:jasjotp/relationship-quality-prediction.git
-``` <br> ```cd relationship-quality-prediction```
+```git clone git@github.com:jasjotp/relationship-quality-prediction.git``` <br> ```cd relationship-quality-prediction```
 
 ------------------------------------------------------------------------
 
