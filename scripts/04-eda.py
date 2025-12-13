@@ -15,7 +15,8 @@ def main(data_file, figure_path):
 
     make_histogram(hcmst, 'relationship_quality',
                    f'{figure_path}/dist-relationship-quality.png',
-                   title='Distribution of Relationship Quality')
+                   title='Distribution of Relationship Quality',
+                   xtick_label=['Excellent', 'Good', 'Fair', 'Poor', 'Very Poor'])
 
     plot_corr(hcmst, f'{figure_path}/corr_plot.png',
               title='Correlation Matrix of Relevant Predictor Variables')
@@ -50,7 +51,7 @@ def main(data_file, figure_path):
     make_histogram(hcmst, 'subject_income_category',
                    f'{figure_path}/dist-income-category.png',
                    title='Distribution of Income Category',
-                   bins=23)
+                   bin=23, xtick_label=[s.replace('_', ' ') for s in income_order])
 
 
 if __name__ == "__main__":
