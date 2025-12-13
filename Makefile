@@ -25,7 +25,13 @@ ROC_PLOT     = $(PLOTS_DIR)/roc_curve.pkl
 EDA_FIGURES = \
 	$(FIG_DIR)/dist-relationship-quality.png \
 	$(FIG_DIR)/corr_plot.png \
-	$(FIG_DIR)/dist-income-category.png
+	$(FIG_DIR)/dist-income-category.png \
+
+MODEL_CM_TRAIN = $(FIG_DIR)/model_confusion_train.png
+MODEL_CM_TEST  = $(FIG_DIR)/model_confusion_test.png
+MODEL_ROC_FIG  = $(FIG_DIR)/model_roc_micro_ovr.png
+
+MODEL_FIGURES = $(MODEL_CM_TRAIN) $(MODEL_CM_TEST) $(MODEL_ROC_FIG)
 
 REPORT_QMD  = $(REPORT_DIR)/relationship_quality_analysis.qmd
 REPORT_HTML = $(REPORT_DIR)/relationship_quality_analysis.html
@@ -69,20 +75,20 @@ $(EDA_FIGURES): $(VALIDATED_CSV)
 
 
 # 05 model
-model: $(LOGREG_MODEL) $(DUMMY_MODEL) $(ROC_PLOT)
+model: $(LOGREG_MODEL) $(DUMMY_MODEL) $(ROC_PLOT) $(MODEL_FIGURES)
 
-$(LOGREG_MODEL) $(DUMMY_MODEL) $(ROC_PLOT): $(X_TRAIN) $(X_TEST) $(Y_TRAIN) $(Y_TEST) $(PREPROCESSOR)
-	mkdir -p $(RESULTS_DIR) $(PLOTS_DIR)
+$(LOGREG_MODEL) $(DUMMY_MODEL) $(ROC_PLOT) $(MODEL_FIGURES): $(X_TRAIN) $(X_TEST) $(Y_TRAIN) $(Y_TEST) $(PREPROCESSOR)
+	mkdir -p $(RESULTS_DIR) $(PLOTS_DIR) $(FIG_DIR)
 	python scripts/05-model.py $(PROC_DIR) $(PREPROCESSOR) $(LOGREG_MODEL)
 
 
 # 06 report
 report: $(REPORT_HTML) $(REPORT_PDF)
 
-$(REPORT_HTML): $(REPORT_QMD) $(EDA_FIGURES) $(LOGREG_MODEL) $(DUMMY_MODEL)
+$(REPORT_HTML): $(REPORT_QMD) $(EDA_FIGURES) $(LOGREG_MODEL) $(DUMMY_MODEL) $(MODEL_FIGURES)
 	quarto render $(REPORT_QMD) --to html
 
-$(REPORT_PDF): $(REPORT_QMD) $(EDA_FIGURES) $(LOGREG_MODEL) $(DUMMY_MODEL)
+$(REPORT_PDF): $(REPORT_QMD) $(EDA_FIGURES) $(LOGREG_MODEL) $(DUMMY_MODEL) $(MODEL_FIGURES)
 	quarto render $(REPORT_QMD) --to pdf
 
 
