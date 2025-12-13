@@ -8,7 +8,7 @@ import matplotlib.pyplot as plt
 from sklearn.dummy import DummyClassifier
 from sklearn.linear_model import LogisticRegression
 
-from functions.evaluation import evaluate_binary_classifier
+from functions.evaluation import evaluate_classifier, save_confusion_matrix
 
 
 @click.command()
@@ -29,8 +29,8 @@ def main(processed_dir, input_preprocessor, output_model):
     # load and apply preprocessor
     preprocessor = joblib.load(preprocessor_path)
 
-    # fit on train only, transform train and test
-    X_train_t = preprocessor.fit_transform(X_train)
+    # do not fit on train again, the saved preprocessor was already fitted in step 3 transform train and test
+    X_train_t = preprocessor.transform(X_train)
     X_test_t = preprocessor.transform(X_test)
 
     # train models
@@ -50,14 +50,32 @@ def main(processed_dir, input_preprocessor, output_model):
     joblib.dump(model, output_model_path)
 
     # evaluation (logreg) + roc curve fig
-    metrics, fig_roc = evaluate_binary_classifier(
+    metrics, fig_roc = evaluate_classifier(
         model, X_train_t, X_test_t, y_train, y_test
     )
 
     click.echo(f"Train accuracy: {metrics['train_accuracy']:.3f}")
     click.echo(f"Test accuracy:  {metrics['test_accuracy']:.3f}")
     click.echo(f"Test ROC AUC:   {metrics['test_roc_auc']:.3f}")
+    
+    # save the confusion matrices of the Logisitic Regression model for the training and test set
+    figures_dir = Path('figures')
+    figures_dir.mkdir(parents = True, exist_ok = True)
 
+    save_confusion_matrix(
+        y_true = y_train,
+        y_pred = model.predict(X_train_t),
+        title = 'Confusion Matrix (Train)',
+        output_path = figures_dir / 'model_confusion_train.png'
+    )
+
+    save_confusion_matrix(
+        y_true = y_test,
+        y_pred = model.predict(X_test_t),
+        title = 'Confusion Matrix (Test)',
+        output_path = figures_dir / 'model_confusion_test.png'
+    )
+    
     # roc curve plot -> pickle
     plots_dir = output_model_path.parent / "plots"
     plots_dir.mkdir(parents=True, exist_ok=True)
@@ -65,7 +83,10 @@ def main(processed_dir, input_preprocessor, output_model):
     roc_pickle_path = plots_dir / "roc_curve.pkl"
     with open(roc_pickle_path, "wb") as f:
         pickle.dump(fig_roc, f)
-
+    
+    # save the roc plot locally to the figures directory
+    fig_roc.savefig(figures_dir / 'model_roc_micro_ovr.png', bbox_inches = 'tight')
+    plt.close(fig_roc)
 
 if __name__ == "__main__":
     main()
