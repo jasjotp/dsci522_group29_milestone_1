@@ -1,7 +1,23 @@
 ---
 title: Predicting Relationship Quality from Relationship Attributes in 2022
 jupyter: python3
-authors: Jasjot Parmar, Eugene Tse, Jade Chen, and Johnson Leung
+author:
+  - name: "Jasjot Parmar"
+    affiliations:
+      - name: "University of British Columbia"
+        department: "Master of Data Science"
+  - name: "Jade Chen"
+    affiliations:
+      - name: "University of British Columbia"
+        department: "Master of Data Science"
+  - name: "Eugene Tse"
+    affiliations:
+      - name: "University of British Columbia"
+        department: "Master of Data Science"
+  - name: "Johnson Leung"
+    affiliations:
+      - name: "University of British Columbia"
+        department: "Master of Data Science"
 execute:
     echo: False 
 format:
