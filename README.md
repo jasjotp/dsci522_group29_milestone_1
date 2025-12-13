@@ -21,6 +21,12 @@ We begin with **exploratory data analysis (EDA)**, examining the distribution of
 
 Model performance is evaluated using **confusion matrices** on both training and test data, as well as a **micro-averaged one-vs-rest ROC curve** to assess overall discriminative ability across classes. Together, the analysis and models provide an interpretable baseline for understanding which characteristics are most associated with higher or lower reported relationship quality, and they establish a reproducible workflow that can be extended with more complex models in later milestones.
 
+*Major conclusions:*
+The analysis finds that relationship quality is most strongly associated with structural and life-stage characteristics rather than short-term or incidental factors. In particular, relationship duration and marital status emerge as key predictors, with longer and married relationships more frequently classified as “excellent” or “good.” Age is highly correlated with relationship duration (ρ ≈ 0.74), indicating that these two variables jointly capture relationship stability over time, while number of children shows a weaker, negative association with age and duration. Income category contributes information but is more evenly distributed above $50k and does not appear to dominate predictions relative to relationship-specific variables. Overall, the logistic regression pipeline demonstrates that a small set of demographic and relationship attributes can meaningfully differentiate higher-quality relationships from lower-quality ones, despite the simplicity of the model.
+
+*Limitations:*
+These conclusions are limited by strong class imbalance, as most respondents report “excellent” or “good” relationship quality, leaving relatively few examples of “fair,” “poor,” or “very poor” relationships for the model to learn from. The reliance on self-reported, cross-sectional survey data also introduces potential reporting bias and prevents any causal interpretation of the associations observed. Finally, the model excludes interpersonal and psychological factors (such as communication quality or conflict resolution), which likely play a substantial role in relationship quality but are not captured by the available features.
+
 View the rendered analysis here: https://jasjotp.github.io/relationship-quality-prediction/
 
 ------------------------------------------------------------------------
