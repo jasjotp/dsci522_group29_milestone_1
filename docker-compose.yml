@@ -1,14 +1,18 @@
 services:
-  dsci522_milestone1:
+  dsci522_milestone4:
     build:
       context: .
       dockerfile: Dockerfile
-    image: dsci522_milestone1
-    container_name: dsci522_milestone1
-    ports:
-      - "8888:8888"
+    image: dsci522_milestone4:0.1
     volumes:
-      - ./:/workspace
+      - ./data:/workspace/data
+      - ./figures:/workspace/figures
+      - ./models:/workspace/models
+      - ./reports:/workspace/reports
+      - ./results:/workspace/results
+      - ./scripts:/workspace/scripts
+      - ./test:/workspace/test
+      - ./Makefile:/workspace/Makefile
     working_dir: /workspace
     stdin_open: true
     tty: true

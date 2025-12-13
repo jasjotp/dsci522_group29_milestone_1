@@ -1,6 +1,9 @@
 # use the miniforge base, make sure you specify a verion
 FROM condaforge/miniforge3:25.9.1-0
 
+# install make so we can run make clean in the container
+RUN apt-get update && apt-get install -y make
+
 # copy the lockfile into the container
 COPY conda-lock.yml conda-lock.yml
 
@@ -17,13 +20,10 @@ RUN echo "source /opt/conda/etc/profile.d/conda.sh && conda activate dockerlock"
 # this ensures that we are starting from an activated dockerlock environment
 SHELL ["/bin/bash", "-l", "-c"]
 
-# expose JupyterLab port
-EXPOSE 8888
-
 # sets the default working directory
 # this is also specified in the compose file
-WORKDIR /workplace
+WORKDIR /workspace
 
 # run JupyterLab on container start
 # uses the jupyterlab from the install environment
-CMD ["conda", "run", "--no-capture-output", "-n", "dockerlock", "jupyter", "lab", "--ip=0.0.0.0", "--port=8888", "--no-browser", "--allow-root", "--IdentityProvider.token=''", "--ServerApp.password=''"]
+CMD ["bash"]

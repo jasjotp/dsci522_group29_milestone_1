@@ -2,7 +2,7 @@ import pandas as pd
 import matplotlib.pyplot as plt
 import seaborn as sns
 import click
-from functions.plot_histogram import plot_histogram
+from functions.plot_histogram import make_histogram
 from functions.plot_corr import plot_corr
 
 @click.command()
@@ -13,7 +13,7 @@ from functions.plot_corr import plot_corr
 def main(data_file, figure_path):
     hcmst = pd.read_csv(data_file)
 
-    plot_histogram(hcmst, 'relationship_quality',
+    make_histogram(hcmst, 'relationship_quality',
                    f'{figure_path}/dist-relationship-quality.png',
                    title='Distribution of Relationship Quality')
 
@@ -47,7 +47,7 @@ def main(data_file, figure_path):
                                                       ordered=True,
                                                       categories=income_order)
 
-    plot_histogram(hcmst, 'subject_income_category',
+    make_histogram(hcmst, 'subject_income_category',
                    f'{figure_path}/dist-income-category.png',
                    title='Distribution of Income Category',
                    bins=23)
