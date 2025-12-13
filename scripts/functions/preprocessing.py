@@ -1,10 +1,7 @@
 from sklearn.compose import make_column_transformer
 from sklearn.preprocessing import OneHotEncoder, OrdinalEncoder, StandardScaler
-from joblib import dump
 from pathlib import Path
 from sklearn.model_selection import train_test_split
-import pandas as pd
-import pandera as pa
 
 def clean_data(df, features, target, int_features, categorical_feature, category_order):
     '''
@@ -39,23 +36,20 @@ def validate_data(X, y, schema_X, schema_y):
     return validated_X, validated_y
 
 def split_and_save_data(df, X, y, output_path):
-    
-    # split data into train and test split
     X_train, X_test, y_train, y_test = train_test_split(
-        X, y, test_size = 0.2, random_state = 123
+        X, y, test_size=0.2, random_state=123
     )
 
-    # save the cleaned csv
-    out_path = Path(output_path)
-    out_path.parent.mkdir(parents=True, exist_ok=True)
+    out_dir = Path(output_path)
+    out_dir.mkdir(parents=True, exist_ok=True)
 
-    # after train_test_split
-    X_train_path = Path(output_path).parent / "X_train.csv"
-    X_test_path = Path(output_path).parent / "X_test.csv"
-    y_train_path = Path(output_path).parent / "y_train.csv"
-    y_test_path = Path(output_path).parent / "y_test.csv"
+    processed_df_path = out_dir / "hcmst_processed.csv"
+    X_train_path = out_dir / "X_train.csv"
+    X_test_path = out_dir / "X_test.csv"
+    y_train_path = out_dir / "y_train.csv"
+    y_test_path = out_dir / "y_test.csv"
 
-    df.to_csv(Path(output_path), index=False)
+    df.to_csv(processed_df_path, index=False)
     X_train.to_csv(X_train_path, index=False)
     X_test.to_csv(X_test_path, index=False)
     y_train.to_frame().to_csv(y_train_path, index=False)
