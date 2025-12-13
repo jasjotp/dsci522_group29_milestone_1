@@ -139,7 +139,7 @@
  
 
 
-\KOMAoption{captions}{tableheading}
+\KOMAoption{captions}{tableheading,figureheading}
 \makeatletter
 \@ifpackageloaded{caption}{}{\usepackage{caption}}
 \AtBeginDocument{%
@@ -186,6 +186,7 @@
 \urlstyle{same}
 \hypersetup{
   pdftitle={Predicting Relationship Quality from Relationship Attributes in 2022},
+  pdfauthor={Jasjot Parmar; Jade Chen; Eugene Tse; Johnson Leung},
   colorlinks=true,
   linkcolor={blue},
   filecolor={Maroon},
@@ -196,7 +197,7 @@
 
 \title{Predicting Relationship Quality from Relationship Attributes in
 2022}
-\author{Jasjot Parmar, Eugene Tse, Jade Chen, and Johnson Leung}
+\author{Jasjot Parmar \and Jade Chen \and Eugene Tse \and Johnson Leung}
 \date{}
 \begin{document}
 \maketitle
@@ -210,8 +211,8 @@
 
 \section{Summary}\label{summary}
 
-In this project, we used a dataset on based on survey responses to
-common relationship questions to develop a logistic regression model to
+In this project, we used a dataset based on survey responses to common
+relationship questions to develop a logistic regression model to
 classify relationships into one of five relationship quality statuses:
 excellent, good, fair, poor, or very poor. The model developed below
 uses common relationship-based features such as whether the subject is
@@ -229,10 +230,10 @@ strategies to improve or maintain that relationship quality. It is often
 difficult for couples to estimate the perceived quality of their
 relationship, so we investigate below if our machine learning model can
 correctly classify the quality of a relationship, based on common
-relationship attributes. The below analysis tries to answer: How well do
+relationship attributes. This analysis asks: \textbf{How well do
 relationship characteristics such as age, income category, marital
 status, relationship duration, and number of children predict
-relationship quality?
+relationship quality?}
 
 The dataset contains 1293 survey responses of common relationship
 characteristics such as the income category of the respondent and their
@@ -240,11 +241,11 @@ estimated relationship quality (our target to predict). This dataset
 (Diverse Data Hub (n.d.)) is originally based on the How Couples Meet
 and Stay Together survey (Rosenfeld, Thomas, and Hausen (2023)). We
 accessed the CSV version of this dataset directly from CRAN (R Core Team
-(n.d.)). The README.md file contains seperate conda lock files that
+(n.d.)). The README.md file contains separate conda lock files that
 explain how to run the environment if you want to run the code. We used
 principles from the Reproducible and Trustworthy Workflows for Data
 Science textbook (Timbers et al. (n.d.)) on conda lock files to manage
-enviornments.
+environments.
 
 In our analysis below, we investigate whether a logistic regression
 model can correctly classify relationship attributes into one of five
@@ -311,14 +312,14 @@ very poor relationship quality.
 
 \begin{figure}[H]
 
+\caption{\label{fig-relationship-quality-dist}Relationship Quality Score
+Distribution}
+
 \centering{
 
 \pandocbounded{\includegraphics[keepaspectratio]{../figures/dist-relationship-quality.png}}
 
 }
-
-\caption{\label{fig-relationship-quality-dist}Relationship Quality Score
-Distributiom}
 
 \end{figure}%
 
@@ -331,13 +332,13 @@ increases, the reported number of children slightly decreases.
 
 \begin{figure}[H]
 
+\caption{\label{fig-corr-plot}Correlation Heatmap}
+
 \centering{
 
 \pandocbounded{\includegraphics[keepaspectratio]{../figures/corr_plot.png}}
 
 }
-
-\caption{\label{fig-corr-plot}Correlation Heatmap}
 
 \end{figure}%
 
@@ -350,19 +351,19 @@ income passes 50k.
 
 \begin{figure}[H]
 
+\caption{\label{fig-income-category}Income Category Distribution}
+
 \centering{
 
 \pandocbounded{\includegraphics[keepaspectratio]{../figures/dist-income-category.png}}
 
 }
 
-\caption{\label{fig-income-category}Income Category Distribution}
-
 \end{figure}%
 
 We then split up the data into the relationship features that we want to
 predict relationship quality with. Input features include: Subject Age,
-Subject Income Category, Martial Status, Relationship Duration, and
+Subject Income Category, Marital Status, Relationship Duration, and
 Number of Children, before splitting the data into train and test
 splits. We then conduct simple data cleaning through changing relevant
 numeric features such as age and number of children into integers,
@@ -420,13 +421,13 @@ quality, the model correctly predicts only 0.9\% of them.
 
 \begin{figure}[H]
 
+\caption{\label{fig-cm-train}Confusion Matrix Training Data}
+
 \centering{
 
 \pandocbounded{\includegraphics[keepaspectratio]{../figures/model_confusion_train.png}}
 
 }
-
-\caption{\label{fig-cm-train}Confusion Matrix Training Data}
 
 \end{figure}%
 
@@ -461,18 +462,18 @@ have very poor relationship quality, the model only correctly predicts
 
 \begin{figure}[H]
 
+\caption{\label{fig-cm-test}Confusion Matrix Test Data}
+
 \centering{
 
 \pandocbounded{\includegraphics[keepaspectratio]{../figures/model_confusion_test.png}}
 
 }
 
-\caption{\label{fig-cm-test}Confusion Matrix Test Data}
-
 \end{figure}%
 
-Our micro-averaged ROC curve (Figure~\ref{fig-roc}) above shows a AUC of
-0.621. This means that our model is not the strongest at correctly
+Our micro-averaged ROC curve (Figure~\ref{fig-roc}) above shows an AUC
+of 0.621. This means that our model is not the strongest at correctly
 predicting relationship quality based on the input relationship features
 we specified above. The ROC curve shows that our model is only slightly
 better than randomly guessing the relationship quality class, meaning
@@ -480,29 +481,29 @@ that our model's accuracy is pretty weak.
 
 \begin{figure}[H]
 
+\caption{\label{fig-roc}ROC Curve}
+
 \centering{
 
 \pandocbounded{\includegraphics[keepaspectratio]{../figures/model_roc_micro_ovr.png}}
 
 }
 
-\caption{\label{fig-roc}ROC Curve}
-
 \end{figure}%
 
 \section{Discussion}\label{discussion}
 
-Our findings above indicate a poor overall accuracies across each class
-on the testing set, with an overall test accuracy from the confusion
-matrix of 28.2\% meaning that the model is poor at predicting the
-correct relationship quality based on features such as age,
-income\_category, marital status, relationship duration, and number of
-children. We also see that the precision and recall of each relationship
-quality class is quite low in the training and testing set. Our poor
-accuracy, precision, and recall for all relationship quality classes
-tells us that with a Logistic Regression model, the features we included
-(age, income category, marital status, relationship duration, and number
-of children) do not predict relationship quality well.
+Our findings above indicate a poor overall accuracy across each class on
+the testing set, with an overall test accuracy from the confusion matrix
+of 28.2\% meaning that the model is poor at predicting the correct
+relationship quality based on features such as age, income\_category,
+marital status, relationship duration, and number of children. We also
+see that the precision and recall of each relationship quality class is
+quite low in the training and testing set. Our poor accuracy, precision,
+and recall for all relationship quality classes tells us that with a
+Logistic Regression model, the features we included (age, income
+category, marital status, relationship duration, and number of children)
+do not predict relationship quality well.
 
 This is generally what we expected to find because the features we chose
 are mostly external or demographic traits about the relationship that
@@ -567,7 +568,7 @@ like yours, as it reduces the risk of overfitting while directly
 addressing imbalance at training time.
 
 We had only tested one model - logistic regression. We could have also
-used An SVM with a linear or kernelized decision boundary and it could
+used an SVM with a linear or kernelized decision boundary and it could
 be effective, particularly if the relationship between predictors and
 quality is not strictly linear. Class weights can be incorporated to
 address imbalance. However, SVMs are less interpretable and can be
@@ -581,9 +582,9 @@ The future questions our above results could lead to are:
   What emotional or personal relationship features (that relate to both
   partners) best predict relationship quality?
 \item
-  Could using a dataset that contains data for relationship matrics from
+  Could using a dataset that contains data for relationship metrics from
   both partners in the relationship improve accuracy of our above
-  Logisitc Regression model?
+  Logistic Regression model?
 \item
   How much better (or worse) would non-linear models such as decision
   trees perform on the same above dataset?
