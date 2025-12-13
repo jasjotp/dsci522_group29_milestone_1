@@ -57,13 +57,13 @@ raw_hcmst = pd.read_csv(url).dropna(subset = ['relationship_duration'])
 
 # Summary 
 
-In this project, we used a dataset on based on survey responses to common relationship questions to develop a logistic regression model to classify relationships into one of five relationship quality statuses: excellent, good, fair, poor, or very poor. The model developed below uses common relationship-based features such as whether the subject is married or not and how many children the subject has in the relationship.
+In this project, we used a dataset based on survey responses to common relationship questions to develop a logistic regression model to classify relationships into one of five relationship quality statuses: excellent, good, fair, poor, or very poor. The model developed below uses common relationship-based features such as whether the subject is married or not and how many children the subject has in the relationship.
 
 # Introduction 
 
-Relationship quality classification is an important topic for couples to be aware of, particularly when trying to maximize the amount of satisfaction each partner receives from the relationship. Accurate relationship quality classification allows couples in relationships to assess the quality of their relationship to develop better targeted strategies to improve or maintain that relationship quality. It is often difficult for couples to estimate the perceived quality of their relationship, so we investigate below if our machine learning model can correctly classify the quality of a relationship, based on common relationship attributes. The below analysis tries to answer: How well do relationship characteristics such as age, income category, marital status, relationship duration, and number of children predict relationship quality?
+Relationship quality classification is an important topic for couples to be aware of, particularly when trying to maximize the amount of satisfaction each partner receives from the relationship. Accurate relationship quality classification allows couples in relationships to assess the quality of their relationship to develop better targeted strategies to improve or maintain that relationship quality. It is often difficult for couples to estimate the perceived quality of their relationship, so we investigate below if our machine learning model can correctly classify the quality of a relationship, based on common relationship attributes. This analysis asks: **How well do relationship characteristics such as age, income category, marital status, relationship duration, and number of children predict relationship quality?**
 
-The dataset contains `{python} len(raw_hcmst)` survey responses of common relationship characteristics such as the income category of the respondent and their estimated relationship quality (our target to predict). This dataset (@diversedatahub) is originally based on the How Couples Meet and Stay Together survey (@hcmst_data_stanford). We accessed the CSV version of this dataset directly from CRAN (@cran_hcmst). The README.md file contains seperate conda lock files that explain how to run the environment if you want to run the code. We used principles from the Reproducible and Trustworthy Workflows for Data Science textbook (@conda_lock_mds) on conda lock files to manage enviornments. 
+The dataset contains `{python} len(raw_hcmst)` survey responses of common relationship characteristics such as the income category of the respondent and their estimated relationship quality (our target to predict). This dataset (@diversedatahub) is originally based on the How Couples Meet and Stay Together survey (@hcmst_data_stanford). We accessed the CSV version of this dataset directly from CRAN (@cran_hcmst). The README.md file contains separate conda lock files that explain how to run the environment if you want to run the code. We used principles from the Reproducible and Trustworthy Workflows for Data Science textbook (@conda_lock_mds) on conda lock files to manage environments. 
 
 In our analysis below, we investigate whether a logistic regression model can correctly classify relationship attributes into one of five relationship quality statuses: excellent, good, fair, poor, or very poor.
 
@@ -333,7 +333,7 @@ hcmst.head()
 
 We can see from the distribution of the Relationship Quality categorical variable, that the dataset contains imbalanced classes, with a very large number of respondents reporting excellent or good relationship quality and a much lower number of respondents reporting fair, poor, and very poor relationship quality.
 
-![Relationship Quality Score Distributiom](../figures/dist-relationship-quality.png){#fig-relationship-quality-dist fig-pos="H"}
+![Relationship Quality Score Distribution](../figures/dist-relationship-quality.png){#fig-relationship-quality-dist fig-pos="H"}
 
 ```{python}
 #| eval: false
@@ -374,7 +374,7 @@ plt.xticks(rotation = 45, ha = 'right')
 plt.tight_layout()
 ```
 
-We then split up the data into the relationship features that we want to predict relationship quality with. Input features include: Subject Age, Subject Income Category, Martial Status, Relationship Duration, and Number of Children, before splitting the data into train and test splits. We then conduct simple data cleaning through changing relevant numeric features such as age and number of children into integers, before reordering the income category feature to be ordered in ascending order by income.
+We then split up the data into the relationship features that we want to predict relationship quality with. Input features include: Subject Age, Subject Income Category, Marital Status, Relationship Duration, and Number of Children, before splitting the data into train and test splits. We then conduct simple data cleaning through changing relevant numeric features such as age and number of children into integers, before reordering the income category feature to be ordered in ascending order by income.
 
 ```{python}
 #| ExecuteTime: {end_time: '2025-11-21T10:35:14.390980Z', start_time: '2025-11-21T10:35:14.376484Z'}
@@ -576,13 +576,13 @@ _ = display.ax_.set(
 )
 ```
 
-Our micro-averaged ROC curve (@fig-roc) above shows a AUC of `{python} float(round(micro_roc_auc_ovr, 3))`. This means that our model is not the strongest at correctly predicting relationship quality based on the input relationship features we specified above. The ROC curve shows that our model is only slightly better than randomly guessing the relationship quality class, meaning that our model's accuracy is pretty weak.
+Our micro-averaged ROC curve (@fig-roc) above shows an AUC of `{python} float(round(micro_roc_auc_ovr, 3))`. This means that our model is not the strongest at correctly predicting relationship quality based on the input relationship features we specified above. The ROC curve shows that our model is only slightly better than randomly guessing the relationship quality class, meaning that our model's accuracy is pretty weak.
 
 ![ROC Curve](../figures/model_roc_micro_ovr.png){#fig-roc fig-pos="H"}
 
 # Discussion
 
-Our findings above indicate a poor overall accuracies across each class on the testing set, with an overall test accuracy from the confusion matrix of `{python} float(round(accuracy_test_cm * 100, 1))`% meaning that the model is poor at predicting the correct relationship quality based on features such as age, income_category, marital status, relationship duration, and number of children. We also see that the precision and recall of each relationship quality class is quite low in the training and testing set. Our poor accuracy, precision, and recall for all relationship quality classes tells us that with a Logistic Regression model, the features we included (age, income category, marital status, relationship duration, and number of children) do not predict relationship quality well.
+Our findings above indicate a poor overall accuracy across each class on the testing set, with an overall test accuracy from the confusion matrix of `{python} float(round(accuracy_test_cm * 100, 1))`% meaning that the model is poor at predicting the correct relationship quality based on features such as age, income_category, marital status, relationship duration, and number of children. We also see that the precision and recall of each relationship quality class is quite low in the training and testing set. Our poor accuracy, precision, and recall for all relationship quality classes tells us that with a Logistic Regression model, the features we included (age, income category, marital status, relationship duration, and number of children) do not predict relationship quality well.
 
 This is generally what we expected to find because the features we chose are mostly external or demographic traits about the relationship that one can argue, do not define the emotional or personal status of a relationship. Since our features do not include deeper characteristics that could matter more for relationship quality compared to demographic features like age, it makes sense our Logistic Regression model is performing poorly.
 
@@ -596,13 +596,13 @@ More generally, cross-validated hyperparameter search (e.g., grid search or rand
 
 Another issue that could have been incorporated into our analysis is the reweighting of class imbalance `class_weight="balanced"`, which reweights the loss function so that errors on minority classes carry more importance. We see that our responding classes are skewed towards categories 'excellent' and/or 'good' and would improve prediction performance.  This approach is simple, does not alter the data distribution, and is often preferable to resampling for smaller datasets like yours, as it reduces the risk of overfitting while directly addressing imbalance at training time.
 
-We had only tested one model - logistic regression.  We could have also used An SVM with a linear or kernelized decision boundary and it could be effective, particularly if the relationship between predictors and quality is not strictly linear. Class weights can be incorporated to address imbalance. However, SVMs are less interpretable and can be sensitive to feature scaling and hyperparameter choices, making them harder to explain in a social-science context.
+We had only tested one model - logistic regression.  We could have also used an SVM with a linear or kernelized decision boundary and it could be effective, particularly if the relationship between predictors and quality is not strictly linear. Class weights can be incorporated to address imbalance. However, SVMs are less interpretable and can be sensitive to feature scaling and hyperparameter choices, making them harder to explain in a social-science context.
 
 The future questions our above results could lead to are:
 
 - What emotional or personal relationship features (that relate to both partners) best predict relationship quality?
 
-- Could using a dataset that contains data for relationship matrics from both partners in the relationship improve accuracy of our above Logisitc Regression model?
+- Could using a dataset that contains data for relationship metrics from both partners in the relationship improve accuracy of our above Logistic Regression model?
 
 - How much better (or worse) would non-linear models such as decision trees perform on the same above dataset?
 
