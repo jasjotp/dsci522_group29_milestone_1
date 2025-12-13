@@ -60,3 +60,13 @@ All changes made to this project after receiving peer and TA feedback are docume
   - See `docker-compose.yml` changes (lines 2 and lines 8-15).
   - Commit ID: d249167c7758bc9b23cdc27b95518be1b9544611
   - Commit Link: https://github.com/jasjotp/relationship-quality-prediction/commit/d249167c7758bc9b23cdc27b95518be1b9544611#diff-9b2f22ed02646d6da5d5ed4fe45c760fc3d9921acb1260eab8a4a61b1c929698
+ 
+---
+
+<GENE-008>
+
+Addressed TA and Peer comments (see GitHub Issues on the 
+- dec966c5e47ce802f20a29ae6a02d35192a80acb
+
+Added Dummy variable (as per Peer Christine requested)
+- d46bbd5d996dab91aa3a0b3e32982f941c09ed77
