@@ -60,7 +60,7 @@ git clone git@github.com:jasjotp/relationship-quality-prediction.git
 
 ------------------------------------------------------------------------
 
-## 2. Create the comptational environment
+## 2. Create the computational environment
 
 <details>
 <summary><b>Option 1: Use `environment.yml`</b></summary>
