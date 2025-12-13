@@ -404,6 +404,8 @@ X_train, X_test, y_train, y_test = train_test_split(
 )
 ```
 
+# Methods
+
 Numeric features have different scales, with age having much larger values than relationship duration and number of children. Therefore, Standard Scaler is applied to numeric features so all numeric features contribute equally to the logistic regression model. Ordinal features such as subject income category are converted to ordinal categories, as their categories have an order based on the income of the subject. Categorical features such as marital status are one hot encoded, resulting in one column indicating martial status or not (0 / 1). Each transformation is wrapped in a column transformer.
 
 ```{python}
@@ -461,6 +463,8 @@ poor_precision_train = precisions_train[3]
 very_poor_precision_train = precisions_train[4]
 
 ```
+
+# Results
 
 To see how our model did on predicting relationship quality based on the training data, we plot a confusion matrix @fig-cm-train. We see that for respondents with excellent relationship quality, the model only correctly predicts `{python} float(round(excellent_recall_train * 100, 1))`% of relationships that have excellent relationship quality correctly (Recall = `{python} float(round(excellent_recall_train, 3))`). Of all relationships that are predicted to have excellent relationship quality,the model correctly predicts `{python} float(round(excellent_precision_train * 100, 1))`% of them (Precision = `{python} float(round(excellent_precision_train, 3))`).
 
