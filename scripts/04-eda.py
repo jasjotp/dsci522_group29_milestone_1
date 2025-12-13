@@ -53,8 +53,8 @@ def main(data_file, figure_path):
                    title='Distribution of Income Category',
 
                    bin=23, xtick_label=[
-            s.replace('_', ' ') if s.startswith('under')
-            else s.replace('_', '-')for s in income_order])
+            s.replace('_', ' ') if s.startswith('under') or s.startswith('over')
+            else s.replace('_', ' - ')for s in income_order])
 
 
 if __name__ == "__main__":
