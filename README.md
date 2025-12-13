@@ -60,7 +60,7 @@ git clone git@github.com:jasjotp/relationship-quality-prediction.git
 
 ------------------------------------------------------------------------
 
-## 2. Create the comptational environment
+## 2. Create the computational environment
 
 <details>
 <summary><b>Option 1: Use `environment.yml`</b></summary>
@@ -152,21 +152,6 @@ All required packages are listed in environment.yml:
 Key dependencies include:<br>
 
 ```         
-<<<<<<< HEAD
-  - python=3.12.12
-  - numpy=2.3.5
-  - pandas=2.3.3
-  - matplotlib=3.10.8 
-  - seaborn=0.13.2
-  - scikit-learn=1.7.2
-  - pip=25.3
-  - pointblank=0.16.0
-  - pandera=0.25.0
-  - pytest 9.0.2
-  - click=8.3.1
-  - ipykernel=7.1.0
-  - quarto=1.8.26
-=======
 python 3.12.12
 numpy 2.3.5
 pandas 2.3.3
@@ -180,7 +165,6 @@ pytest 9.0.2
 click 8.3.1
 ipykernel 7.1.0
 quarto 1.8.26
->>>>>>> main
 ```
 
 To update dependencies, modify `environment.yml` and regenerate the lockfile:
