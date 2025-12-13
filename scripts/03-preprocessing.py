@@ -2,9 +2,10 @@ from pathlib import Path
 import click 
 import pandas as pd
 from joblib import dump
+import os
+os.environ["DISABLE_PANDERA_IMPORT_WARNING"] = "True"
 import pandera as pa
-import sys 
-import os 
+import sys
 
 # appends the parent directory to the system path so we can import files from parent directories
 sys.path.append(os.path.join(os.path.dirname(__file__), ".."))
