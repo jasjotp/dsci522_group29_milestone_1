@@ -65,10 +65,10 @@ All changes made to this project after receiving peer and TA feedback are docume
 
 GENE-008's (Eugene Tse) changes
 
-Addressed TA and Peer comments (see GitHub Issues)
+Addressed TA and Peer comments (see GitHub Issues -> https://github.com/UBC-MDS/data-analysis-review-2025/issues/35)
 - dec966c5e47ce802f20a29ae6a02d35192a80acb
 
-Added Dummy variable (as per Peer Christine requested)
+Added Dummy variable (as per Peer Christine requested )
 - d46bbd5d996dab91aa3a0b3e32982f941c09ed77
 
 ---
