@@ -116,4 +116,29 @@ Added Dummy variable (as per Peer Christine requested )
 * **Change made:** Added a target–feature leakage check using `pointblank`.
 * **Evidence:** Pull request: #59
 
+#### Added justification for data validation check
+
+* **Feedback:** You should define and justify thresholds for expected distribution carefully.
+* **Change made:** Added a comment that explains reasoning behind checks performed
+* **Evidence:** scripts/02-validation.py line 227 - 230
+
+#### Added methods and results header
+* **Feedback:** Please also clearly add Methods section and Results section title
+* **Change made:** Added methods and results header
+* **Evidence:** commit 92fd48c
+
+#### Added Creative Commons license
+* **Feedback:** No Creative Commons license (for project report) was specified. LICENSE file did not contain names of all group members
+* **Change made:** Added Creative Commons license
+* **Evidence:** LICENSE file
+
+#### Fixed plot axes
+* **Feedback:** There are variable names displayed on the plot, please use phrases separated by whitespace, not underscore
+* **Change made:** Used white space instead of underscore
+* **Evidence:** scripts/04-eda.py line 19 and 56
+
+#### Fixed font size for plots
+* **Feedback:** The font size is too small for plots, especially the bar plots
+* **Change made:** plot is bigger when redered quarto
+* **Evidence:** reports/relationship_quality_analysis.pdf
 ---
