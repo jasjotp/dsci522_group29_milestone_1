@@ -140,7 +140,7 @@ Added Dummy variable (as per Peer Christine requested )
 #### Fixed font size for plots
 * **Feedback:** The font size is too small for plots, especially the bar plots
 * **Change made:** plot is bigger when redered quarto
-* **Evidence:** reports/relationship_quality_analysis.html
+* **Evidence:** index.html
 
 #### Fixed environment.yml
 * **Feedback:** ipykernal is misspelled in your environment.yml.
